@@ -1,6 +1,7 @@
 [![build](https://github.com/whiteo/mylfa/actions/workflows/build.yml/badge.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
 [![coverage](https://raw.githubusercontent.com/whiteo/mylfa/badges/jacoco.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
 [![branch coverage](https://raw.githubusercontent.com/whiteo/mylfa/badges/branches.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
+[![Docker Version](https://img.shields.io/docker/v/whiteo/mylfa?sort=semver)](https://hub.docker.com/r/whiteo/mylfa/)
 
 # MyLFA aka my little finance analyst — a software to manage and analyze your finances.
 
