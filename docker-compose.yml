@@ -1,0 +1,15 @@
+version: '3.8'
+
+volumes:
+  mylfa_data:
+
+services:
+  mylfa:
+    container_name: mylfa
+    image: whiteo/mylfa:latest
+    restart: always
+    env_file: .env
+    volumes:
+      - mylfa_data:/app/mylfa/
+    ports:
+      - '8080:8080'
