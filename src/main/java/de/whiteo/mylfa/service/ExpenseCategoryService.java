@@ -1,9 +1,10 @@
 package de.whiteo.mylfa.service;
 
-import de.whiteo.mylfa.config.NoModifyDemoMode;
+import de.whiteo.mylfa.aspect.NoModifyDemoMode;
 import de.whiteo.mylfa.domain.ExpenseCategory;
 import de.whiteo.mylfa.domain.User;
 import de.whiteo.mylfa.dto.expensecategory.ExpenseCategoryCreateOrUpdateRequest;
+import de.whiteo.mylfa.dto.expensecategory.ExpenseCategoryFindAllRequest;
 import de.whiteo.mylfa.dto.expensecategory.ExpenseCategoryResponse;
 import de.whiteo.mylfa.exception.ExecutionConflictException;
 import de.whiteo.mylfa.exception.NotFoundObjectException;
@@ -42,10 +43,10 @@ public class ExpenseCategoryService extends
         this.mapper = mapper;
     }
 
-    public Page<ExpenseCategoryResponse> findAll(String userName, Boolean hide, Pageable pageable) {
+    public Page<ExpenseCategoryResponse> findAll(String userName, ExpenseCategoryFindAllRequest request, Pageable pageable) {
         User user = userService.findByEmail(userName);
 
-        Page<Object[]> page = repository.findAllByParamsWithJoin(user.getId(), hide, pageable);
+        Page<Object[]> page = repository.findAllByParamsWithJoin(user.getId(), request.getHide(), pageable);
 
         List<ExpenseCategoryResponse> responses = page.stream()
                 .map(this::mapObjectsToResponse).collect(Collectors.toList());

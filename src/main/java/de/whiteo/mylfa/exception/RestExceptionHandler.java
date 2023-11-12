@@ -64,81 +64,80 @@ public class RestExceptionHandler {
         return buildResponse(INTERNAL_SERVER_ERROR, ErrorType.UNDEFINED_ERROR, message, ex);
     }
 
-    @ExceptionHandler(HttpClientErrorException.class)
     @ResponseStatus(UNAUTHORIZED)
+    @ExceptionHandler(HttpClientErrorException.class)
     protected ResponseEntity<ResponseError> handleHttpClientErrorException(HttpClientErrorException ex) {
         return buildResponse(UNAUTHORIZED, ErrorType.AUTHORIZATION_ERROR, ex.getMessage(), ex);
     }
 
-    @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(UNAUTHORIZED)
+    @ExceptionHandler(BadCredentialsException.class)
     protected ResponseEntity<ResponseError> handleBadCredentialsException(BadCredentialsException ex) {
         return buildResponse(UNAUTHORIZED, ErrorType.AUTHORIZATION_ERROR, ex.getMessage(), ex);
     }
 
-    @ExceptionHandler(ExecutionConflictException.class)
     @ResponseStatus(CONFLICT)
+    @ExceptionHandler(ExecutionConflictException.class)
     protected ResponseEntity<ResponseError> handleExecutionConflictException(ExecutionConflictException ex) {
         return buildResponse(CONFLICT, ErrorType.CONFLICT, ex.getMessage(), ex);
     }
 
-    @ExceptionHandler(NotFoundObjectException.class)
     @ResponseStatus(NOT_FOUND)
+    @ExceptionHandler(NotFoundObjectException.class)
     protected ResponseEntity<ResponseError> handleNotFoundObjectException(NotFoundObjectException ex) {
         return buildResponse(NOT_FOUND, ErrorType.NOT_FOUND, ex.getMessage(), ex);
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<ResponseError> handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException ex) {
         return buildResponse(BAD_REQUEST, ErrorType.BAD_REQUEST, ex.getMessage(), ex);
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ResponseError> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         return buildResponse(BAD_REQUEST, ErrorType.BAD_REQUEST, ex.getMessage(), ex);
     }
 
-    @ExceptionHandler(HttpMessageConversionException.class)
     @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(HttpMessageConversionException.class)
     public ResponseEntity<ResponseError> handleMessageConversionException(HttpMessageConversionException ex) {
         return buildResponse(BAD_REQUEST, ErrorType.REQUEST_MESSAGE_CONVERSION_ERROR,
                 getJsonExceptionMessage(ex), ex);
     }
 
-    @ExceptionHandler(ServletRequestBindingException.class)
     @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(ServletRequestBindingException.class)
     public ResponseEntity<ResponseError> handleServletRequestBinding(ServletRequestBindingException ex) {
         return buildResponse(BAD_REQUEST, ErrorType.REQUEST_MISSING_PARAMETER,
                 getRootCauseMessage(ex), ex);
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ResponseError> handleConstraintViolation(ConstraintViolationException ex) {
         return buildResponse(BAD_REQUEST, ErrorType.REQUEST_MISSING_PARAMETER,
                 getRootCauseMessage(ex), ex);
     }
 
-    @ExceptionHandler(TypeMismatchException.class)
     @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(TypeMismatchException.class)
     public ResponseEntity<ResponseError> handleTypeMismatch(TypeMismatchException ex) {
         String requiredType = ofNullable(ex.getRequiredType()).map(Class::getSimpleName).orElse("<empty>");
         String message = getRootCauseMessage(ex) + ", required type '" + requiredType + "'";
         return buildResponse(BAD_REQUEST, ErrorType.REQUEST_TYPE_MISMATCH, message, ex);
     }
 
-    @ExceptionHandler(UnsupportedOperationException.class)
     @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(UnsupportedOperationException.class)
     public ResponseEntity<ResponseError> handleUnsupportedOperation(UnsupportedOperationException ex) {
         return buildResponse(BAD_REQUEST, ErrorType.UNSUPPORTED_OPERATION, getRootCauseMessage(ex), ex);
     }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(BAD_REQUEST)
     @ResponseBody
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ResponseError> validationError(MethodArgumentNotValidException ex) {
         BindingResult result = ex.getBindingResult();
         List<FieldError> fieldErrors = result.getFieldErrors();

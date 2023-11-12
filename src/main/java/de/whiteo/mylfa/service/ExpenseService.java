@@ -6,6 +6,7 @@ import de.whiteo.mylfa.domain.ExpenseCategory;
 import de.whiteo.mylfa.domain.User;
 import de.whiteo.mylfa.dto.currencytype.CurrencyTypeResponse;
 import de.whiteo.mylfa.dto.expense.ExpenseCreateOrUpdateRequest;
+import de.whiteo.mylfa.dto.expense.ExpenseFindAllRequest;
 import de.whiteo.mylfa.dto.expense.ExpenseResponse;
 import de.whiteo.mylfa.dto.expensecategory.ExpenseCategoryResponse;
 import de.whiteo.mylfa.exception.NotFoundObjectException;
@@ -22,7 +23,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,15 +56,17 @@ public class ExpenseService extends AbstractService<Expense, ExpenseResponse, Ex
         this.mapper = mapper;
     }
 
-    public Page<ExpenseResponse> findAll(String userName, UUID categoryId, UUID currencyTypeId,
-                                         LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+    public Page<ExpenseResponse> findAll(String userName, ExpenseFindAllRequest request, Pageable pageable) {
         User user = userService.findByEmail(userName);
 
+        categoryRepository.getOrNull(request.getCategoryId());
+        currencyTypeRepository.getOrNull(request.getCurrencyTypeId());
+
         Page<Object[]> page = repository.findAllByParamsWithJoin(user.getId(),
-                categoryId,
-                currencyTypeId,
-                DateUtil.setCorrectTime(startDate, true),
-                DateUtil.setCorrectTime(endDate, false),
+                request.getCategoryId(),
+                request.getCurrencyTypeId(),
+                DateUtil.setCorrectTime(request.getStartDate(), true),
+                DateUtil.setCorrectTime(request.getEndDate(), false),
                 pageable);
 
         List<ExpenseResponse> responses = page.getContent()

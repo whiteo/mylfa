@@ -9,7 +9,7 @@ import de.whiteo.mylfa.dto.user.UserUpdatePropertiesRequest;
 import de.whiteo.mylfa.dto.user.UserUpdateRequest;
 import de.whiteo.mylfa.helper.TokenHelper;
 import de.whiteo.mylfa.repository.UserRepository;
-import de.whiteo.mylfa.util.JwtTokenUtil;
+import de.whiteo.mylfa.security.TokenInteract;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -45,11 +45,11 @@ class UserRestControllerTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
     @Autowired
+    private TokenInteract tokenInteract;
+    @Autowired
     private UserRepository repository;
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
     private TokenHelper tokenHelper;
     private UserBuilder builder;
     private MockMvc mockMvc;
@@ -58,7 +58,7 @@ class UserRestControllerTest {
     void initialize() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         builder = new UserBuilder(repository);
-        tokenHelper = new TokenHelper(jwtTokenUtil);
+        tokenHelper = new TokenHelper(tokenInteract);
     }
 
     @Test
@@ -91,7 +91,7 @@ class UserRestControllerTest {
     void delete_successful() throws Exception {
         User user = builder.buildUser();
 
-        mockMvc.perform(delete(String.format("/api/v1/user/%s", user.getId()))
+        mockMvc.perform(delete(String.format("/api/v1/user/delete/%s", user.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isNoContent());
@@ -100,7 +100,7 @@ class UserRestControllerTest {
     @Test
     @Transactional
     void delete_unsuccessful() throws Exception {
-        mockMvc.perform(delete(String.format("/api/v1/user/%s", UUID.randomUUID()))
+        mockMvc.perform(delete(String.format("/api/v1/user/delete/%s", UUID.randomUUID()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(RandomStringUtils.randomAlphabetic(20))))
                 .andExpect(status().isNotFound());
@@ -114,7 +114,7 @@ class UserRestControllerTest {
         UserUpdateRequest request = UserBuilder.buildUserUpdateRequest(
                 RandomStringUtils.randomAlphabetic(5) + "@test.com");
 
-        mockMvc.perform(put(String.format("/api/v1/user/%s/edit", user.getId()))
+        mockMvc.perform(put(String.format("/api/v1/user/edit/%s", user.getId()))
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -129,7 +129,7 @@ class UserRestControllerTest {
         UserUpdateRequest request = UserBuilder.buildUserUpdateRequest(
                 RandomStringUtils.randomAlphabetic(5) + "@test.com");
 
-        mockMvc.perform(put(String.format("/api/v1/user/%s/edit", UUID.randomUUID()))
+        mockMvc.perform(put(String.format("/api/v1/user/edit/%s", UUID.randomUUID()))
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -147,7 +147,7 @@ class UserRestControllerTest {
 
         UserUpdatePropertiesRequest request = UserBuilder.buildUserUpdatePropertiesRequest(properties);
 
-        mockMvc.perform(put(String.format("/api/v1/user/%s/edit-properties", user.getId()))
+        mockMvc.perform(put(String.format("/api/v1/user/edit-properties/%s", user.getId()))
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -164,7 +164,7 @@ class UserRestControllerTest {
 
         UserUpdatePropertiesRequest request = UserBuilder.buildUserUpdatePropertiesRequest(properties);
 
-        mockMvc.perform(put(String.format("/api/v1/user/%s/edit-properties", user.getId()))
+        mockMvc.perform(put(String.format("/api/v1/user/edit-properties/%s", user.getId()))
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -179,7 +179,7 @@ class UserRestControllerTest {
                 RandomStringUtils.randomAlphabetic(20),
                 String.valueOf(user.getPassword()));
 
-        mockMvc.perform(put(String.format("/api/v1/user/%s/edit-password", user.getId()))
+        mockMvc.perform(put(String.format("/api/v1/user/edit-password/%s", user.getId()))
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -195,7 +195,7 @@ class UserRestControllerTest {
                 RandomStringUtils.randomAlphabetic(20),
                 String.valueOf(user.getPassword()));
 
-        mockMvc.perform(put(String.format("/api/v1/user/%s/edit-password", UUID.randomUUID()))
+        mockMvc.perform(put(String.format("/api/v1/user/edit-password/%s", UUID.randomUUID()))
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -207,7 +207,7 @@ class UserRestControllerTest {
     void find_successful() throws Exception {
         User user = builder.buildUser();
 
-        mockMvc.perform(get(String.format("/api/v1/user/%s", user.getId()))
+        mockMvc.perform(get(String.format("/api/v1/user/find/%s", user.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isOk());
@@ -218,7 +218,7 @@ class UserRestControllerTest {
     void find_unsuccessful() throws Exception {
         User user = builder.buildUser();
 
-        mockMvc.perform(get(String.format("/api/v1/user/%s", UUID.randomUUID()))
+        mockMvc.perform(get(String.format("/api/v1/user/find/%s", UUID.randomUUID()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isNotFound());

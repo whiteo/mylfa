@@ -6,6 +6,7 @@ import de.whiteo.mylfa.domain.IncomeCategory;
 import de.whiteo.mylfa.domain.User;
 import de.whiteo.mylfa.dto.currencytype.CurrencyTypeResponse;
 import de.whiteo.mylfa.dto.income.IncomeCreateOrUpdateRequest;
+import de.whiteo.mylfa.dto.income.IncomeFindAllRequest;
 import de.whiteo.mylfa.dto.income.IncomeResponse;
 import de.whiteo.mylfa.dto.incomecategory.IncomeCategoryResponse;
 import de.whiteo.mylfa.exception.NotFoundObjectException;
@@ -22,7 +23,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,15 +56,17 @@ public class IncomeService extends AbstractService<Income, IncomeResponse, Incom
         this.mapper = mapper;
     }
 
-    public Page<IncomeResponse> findAll(String userName, UUID categoryId, UUID currencyTypeId,
-                                         LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+    public Page<IncomeResponse> findAll(String userName, IncomeFindAllRequest request, Pageable pageable) {
         User user = userService.findByEmail(userName);
 
+        categoryRepository.getOrNull(request.getCategoryId());
+        currencyTypeRepository.getOrNull(request.getCurrencyTypeId());
+
         Page<Object[]> page = repository.findAllByParamsWithJoin(user.getId(),
-                categoryId,
-                currencyTypeId,
-                DateUtil.setCorrectTime(startDate, true),
-                DateUtil.setCorrectTime(endDate, false),
+                request.getCategoryId(),
+                request.getCurrencyTypeId(),
+                DateUtil.setCorrectTime(request.getStartDate(), true),
+                DateUtil.setCorrectTime(request.getEndDate(), false),
                 pageable);
 
         List<IncomeResponse> responses = page.getContent()

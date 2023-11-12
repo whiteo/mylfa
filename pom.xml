@@ -14,7 +14,7 @@
     <groupId>de.whiteo</groupId>
     <artifactId>mylfa</artifactId>
     <name>mylfa</name>
-    <version>1.1</version>
+    <version>1.1.1</version>
     <description>mylfa core service</description>
     <packaging>jar</packaging>
 

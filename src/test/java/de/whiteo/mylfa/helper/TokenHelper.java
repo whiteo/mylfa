@@ -1,7 +1,7 @@
 package de.whiteo.mylfa.helper;
 
+import de.whiteo.mylfa.security.TokenInteract;
 import de.whiteo.mylfa.security.UserDetailsImpl;
-import de.whiteo.mylfa.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -11,13 +11,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TokenHelper {
 
-    private final JwtTokenUtil jwtTokenUtil;
+    private final TokenInteract tokenInteract;
 
     public String getToken(String namePassword) {
         UserDetailsImpl userDetails = UserDetailsImpl.builder()
                 .name(namePassword)
                 .password(namePassword.toCharArray())
                 .build();
-        return "Bearer " + jwtTokenUtil.generateToken(userDetails);
+        return "Bearer " + tokenInteract.generateToken(userDetails);
     }
 }

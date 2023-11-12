@@ -6,10 +6,11 @@ import de.whiteo.mylfa.builder.UserBuilder;
 import de.whiteo.mylfa.domain.IncomeCategory;
 import de.whiteo.mylfa.domain.User;
 import de.whiteo.mylfa.dto.incomecategory.IncomeCategoryCreateOrUpdateRequest;
+import de.whiteo.mylfa.dto.incomecategory.IncomeCategoryFindAllRequest;
 import de.whiteo.mylfa.helper.TokenHelper;
 import de.whiteo.mylfa.repository.IncomeCategoryRepository;
 import de.whiteo.mylfa.repository.UserRepository;
-import de.whiteo.mylfa.util.JwtTokenUtil;
+import de.whiteo.mylfa.security.TokenInteract;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -44,13 +45,13 @@ class IncomeCategoryRestControllerTest {
     private WebApplicationContext webApplicationContext;
     @Autowired
     private IncomeCategoryRepository repository;
-    private IncomeCategoryBuilder builder;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private TokenInteract tokenInteract;
+    private IncomeCategoryBuilder builder;
     private TokenHelper tokenHelper;
     private UserBuilder userBuilder;
     private MockMvc mockMvc;
@@ -59,7 +60,7 @@ class IncomeCategoryRestControllerTest {
     void initialize() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         builder = new IncomeCategoryBuilder(repository);
-        tokenHelper = new TokenHelper(jwtTokenUtil);
+        tokenHelper = new TokenHelper(tokenInteract);
         userBuilder = new UserBuilder(userRepository);
     }
 
@@ -73,7 +74,7 @@ class IncomeCategoryRestControllerTest {
         IncomeCategoryCreateOrUpdateRequest request = IncomeCategoryBuilder.buildRequest(
                 RandomStringUtils.randomAlphabetic(20));
 
-        mockMvc.perform(post("/api/v1/income-category")
+        mockMvc.perform(post("/api/v1/income-category/create")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -90,7 +91,7 @@ class IncomeCategoryRestControllerTest {
 
         IncomeCategoryCreateOrUpdateRequest request = IncomeCategoryBuilder.buildRequest(randomString);
 
-        mockMvc.perform(post("/api/v1/income-category")
+        mockMvc.perform(post("/api/v1/income-category/create")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -104,7 +105,7 @@ class IncomeCategoryRestControllerTest {
 
         IncomeCategory incomeCategory = prepareTest(RandomStringUtils.randomAlphabetic(20), user);
 
-        mockMvc.perform(delete("/api/v1/income-category/" + incomeCategory.getId())
+        mockMvc.perform(delete(String.format("/api/v1/income-category/delete/%s", incomeCategory.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isNoContent());
@@ -115,7 +116,7 @@ class IncomeCategoryRestControllerTest {
     void delete_unsuccessful() throws Exception {
         User user = userBuilder.buildUser();
 
-        mockMvc.perform(delete(String.format("/api/v1/income-category/%s", UUID.randomUUID()))
+        mockMvc.perform(delete(String.format("/api/v1/income-category/delete/%s", UUID.randomUUID()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isNotFound());
@@ -131,7 +132,7 @@ class IncomeCategoryRestControllerTest {
         IncomeCategoryCreateOrUpdateRequest request = IncomeCategoryBuilder.buildRequest(
                 RandomStringUtils.randomAlphabetic(20));
 
-        mockMvc.perform(put(String.format("/api/v1/income-category/%s/edit", incomeCategory.getId()))
+        mockMvc.perform(put(String.format("/api/v1/income-category/edit/%s", incomeCategory.getId()))
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -148,7 +149,7 @@ class IncomeCategoryRestControllerTest {
 
         IncomeCategoryCreateOrUpdateRequest request = IncomeCategoryBuilder.buildRequest(randomString);
 
-        mockMvc.perform(put(String.format("/api/v1/income-category/%s/edit", incomeCategory.getId()))
+        mockMvc.perform(put(String.format("/api/v1/income-category/edit/%s", incomeCategory.getId()))
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -162,7 +163,7 @@ class IncomeCategoryRestControllerTest {
 
         IncomeCategory incomeCategory = prepareTest(RandomStringUtils.randomAlphabetic(20), user);
 
-        mockMvc.perform(get(String.format("/api/v1/income-category/%s", incomeCategory.getId()))
+        mockMvc.perform(get(String.format("/api/v1/income-category/find/%s", incomeCategory.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isOk());
@@ -173,7 +174,7 @@ class IncomeCategoryRestControllerTest {
     void find_unsuccessful() throws Exception {
         User user = userBuilder.buildUser();
 
-        mockMvc.perform(get(String.format("/api/v1/income-category/%s", UUID.randomUUID()))
+        mockMvc.perform(get(String.format("/api/v1/income-category/find/%s", UUID.randomUUID()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isNotFound());
@@ -188,9 +189,10 @@ class IncomeCategoryRestControllerTest {
             prepareTest(RandomStringUtils.randomAlphabetic(20), user);
         }
 
-        mockMvc.perform(get("/api/v1/income-category")
-                        .param("page", "0")
-                        .param("size", "10")
+        IncomeCategoryFindAllRequest request = IncomeCategoryBuilder.buildFindAllRequest();
+
+        mockMvc.perform(post("/api/v1/income-category/find")
+                        .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isOk());
@@ -201,7 +203,10 @@ class IncomeCategoryRestControllerTest {
     void find_empty_successful() throws Exception {
         User user = userBuilder.buildUser();
 
-        mockMvc.perform(get("/api/v1/income-category")
+        IncomeCategoryFindAllRequest request = IncomeCategoryBuilder.buildFindAllRequest();
+
+        mockMvc.perform(post("/api/v1/income-category/find")
+                        .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isOk());

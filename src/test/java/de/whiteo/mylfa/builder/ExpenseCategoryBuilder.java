@@ -2,6 +2,7 @@ package de.whiteo.mylfa.builder;
 
 import de.whiteo.mylfa.domain.ExpenseCategory;
 import de.whiteo.mylfa.dto.expensecategory.ExpenseCategoryCreateOrUpdateRequest;
+import de.whiteo.mylfa.dto.expensecategory.ExpenseCategoryFindAllRequest;
 import de.whiteo.mylfa.repository.ExpenseCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -31,6 +32,12 @@ public class ExpenseCategoryBuilder {
         request.setName(name);
         request.setHide(new Random().nextBoolean());
         request.setParentId(parentId);
+        return request;
+    }
+
+    public static ExpenseCategoryFindAllRequest buildFindAllRequest() {
+        ExpenseCategoryFindAllRequest request = new ExpenseCategoryFindAllRequest();
+        request.setHide(random.nextBoolean());
         return request;
     }
 

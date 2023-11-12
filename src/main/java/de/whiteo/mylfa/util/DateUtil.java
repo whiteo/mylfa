@@ -1,11 +1,14 @@
 package de.whiteo.mylfa.util;
 
+import lombok.experimental.UtilityClass;
+
 import java.time.LocalDateTime;
 
 /**
  * @author Leo Tanas (<a href="https://github.com/whiteo">github</a>)
  */
 
+@UtilityClass
 public class DateUtil {
 
     public static final String PATTERN_ISO_8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";

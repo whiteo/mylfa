@@ -1,9 +1,10 @@
 package de.whiteo.mylfa.service;
 
-import de.whiteo.mylfa.config.NoModifyDemoMode;
+import de.whiteo.mylfa.aspect.NoModifyDemoMode;
 import de.whiteo.mylfa.domain.CurrencyType;
 import de.whiteo.mylfa.domain.User;
 import de.whiteo.mylfa.dto.currencytype.CurrencyTypeCreateOrUpdateRequest;
+import de.whiteo.mylfa.dto.currencytype.CurrencyTypeFindAllRequest;
 import de.whiteo.mylfa.dto.currencytype.CurrencyTypeResponse;
 import de.whiteo.mylfa.exception.ExecutionConflictException;
 import de.whiteo.mylfa.mapper.CurrencyTypeMapper;
@@ -37,10 +38,10 @@ public class CurrencyTypeService extends
         this.mapper = mapper;
     }
 
-    public Page<CurrencyTypeResponse> findAll(String userName, Boolean hide, Pageable pageable) {
+    public Page<CurrencyTypeResponse> findAll(String userName, CurrencyTypeFindAllRequest request, Pageable pageable) {
         User user = userService.findByEmail(userName);
 
-        return repository.findAllByUserIdAndHide(user.getId(), hide, pageable).map(mapper::toResponse);
+        return repository.findAllByUserIdAndHide(user.getId(), request.getHide(), pageable).map(mapper::toResponse);
     }
 
     @NoModifyDemoMode

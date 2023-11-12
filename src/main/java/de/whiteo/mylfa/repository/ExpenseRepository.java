@@ -24,8 +24,8 @@ public interface ExpenseRepository extends AbstractRepository<Expense> {
     List<Object[]> findByUserIdAndId(@Param("userId") UUID userId, @Param("id") UUID id);
 
     @Query("SELECT e, ct, ec FROM Expense e " +
-            "LEFT JOIN CurrencyType ct ON e.currencyTypeId = ct.id AND ct.userId = :userId " +
-            "LEFT JOIN ExpenseCategory ec ON e.categoryId = ec.id AND ec.userId = :userId " +
+            "INNER JOIN CurrencyType ct ON e.currencyTypeId = ct.id AND ct.hide = false AND ct.userId = :userId " +
+            "INNER JOIN ExpenseCategory ec ON e.categoryId = ec.id AND ec.userId = :userId " +
             "WHERE e.userId = :userId " +
             "AND (coalesce(:categoryId, NULL) IS NULL OR e.categoryId = :categoryId) " +
             "AND (coalesce(:currencyTypeId, NULL) IS NULL OR e.currencyTypeId = :currencyTypeId) " +

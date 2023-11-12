@@ -10,12 +10,13 @@ import de.whiteo.mylfa.domain.Expense;
 import de.whiteo.mylfa.domain.ExpenseCategory;
 import de.whiteo.mylfa.domain.User;
 import de.whiteo.mylfa.dto.expense.ExpenseCreateOrUpdateRequest;
+import de.whiteo.mylfa.dto.expense.ExpenseFindAllRequest;
 import de.whiteo.mylfa.helper.TokenHelper;
 import de.whiteo.mylfa.repository.CurrencyTypeRepository;
 import de.whiteo.mylfa.repository.ExpenseCategoryRepository;
 import de.whiteo.mylfa.repository.ExpenseRepository;
 import de.whiteo.mylfa.repository.UserRepository;
-import de.whiteo.mylfa.util.JwtTokenUtil;
+import de.whiteo.mylfa.security.TokenInteract;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -52,16 +53,16 @@ class ExpenseRestControllerTest {
     private CurrencyTypeRepository currencyTypeRepository;
     @Autowired
     private WebApplicationContext webApplicationContext;
-    private ExpenseCategoryBuilder expenseCategoryBuilder;
-    private CurrencyTypeBuilder currencyTypeBuilder;
-    @Autowired
-    private ExpenseRepository repository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private ObjectMapper objectMapper;
+    private TokenInteract tokenInteract;
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private ExpenseRepository repository;
+    @Autowired
+    private ObjectMapper objectMapper;
+    private ExpenseCategoryBuilder expenseCategoryBuilder;
+    private CurrencyTypeBuilder currencyTypeBuilder;
     private TokenHelper tokenHelper;
     private UserBuilder userBuilder;
     private ExpenseBuilder builder;
@@ -73,7 +74,7 @@ class ExpenseRestControllerTest {
         expenseCategoryBuilder = new ExpenseCategoryBuilder(expenseCategoryRepository);
         currencyTypeBuilder = new CurrencyTypeBuilder(currencyTypeRepository);
         userBuilder = new UserBuilder(userRepository);
-        tokenHelper = new TokenHelper(jwtTokenUtil);
+        tokenHelper = new TokenHelper(tokenInteract);
         builder = new ExpenseBuilder(repository);
     }
 
@@ -87,7 +88,7 @@ class ExpenseRestControllerTest {
         ExpenseCreateOrUpdateRequest request = ExpenseBuilder.buildRequest(
                 expense.getCategoryId(), expense.getCurrencyTypeId());
 
-        mockMvc.perform(post("/api/v1/expense")
+        mockMvc.perform(post("/api/v1/expense/create")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -105,7 +106,7 @@ class ExpenseRestControllerTest {
         ExpenseCreateOrUpdateRequest request = ExpenseBuilder.buildRequest(
                 expense.getCategoryId(), UUID.randomUUID());
 
-        mockMvc.perform(post("/api/v1/expense")
+        mockMvc.perform(post("/api/v1/expense/create")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -119,7 +120,7 @@ class ExpenseRestControllerTest {
 
         Expense expense = prepareTest(RandomStringUtils.randomAlphabetic(20), user.getId());
 
-        mockMvc.perform(delete("/api/v1/expense/" + expense.getId())
+        mockMvc.perform(delete(String.format("/api/v1/expense/delete/%s", expense.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isNoContent());
@@ -130,7 +131,7 @@ class ExpenseRestControllerTest {
     void delete_unsuccessful() throws Exception {
         User user = userBuilder.buildUser();
 
-        mockMvc.perform(delete(String.format("/api/v1/expense/%s", UUID.randomUUID()))
+        mockMvc.perform(delete(String.format("/api/v1/expense/delete/%s", UUID.randomUUID()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isNotFound());
@@ -146,7 +147,7 @@ class ExpenseRestControllerTest {
         ExpenseCreateOrUpdateRequest request = ExpenseBuilder.buildRequest(
                 expense.getCategoryId(), expense.getCurrencyTypeId());
 
-        mockMvc.perform(put(String.format("/api/v1/expense/%s/edit", expense.getId()))
+        mockMvc.perform(put(String.format("/api/v1/expense/edit/%s", expense.getId()))
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -165,7 +166,7 @@ class ExpenseRestControllerTest {
                 expense.getCategoryId(), expense.getCurrencyTypeId());
 
 
-        mockMvc.perform(put(String.format("/api/v1/expense/%s/edit", UUID.randomUUID()))
+        mockMvc.perform(put(String.format("/api/v1/expense/edit/%s", UUID.randomUUID()))
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -179,7 +180,7 @@ class ExpenseRestControllerTest {
 
         Expense expense = prepareTest(RandomStringUtils.randomAlphabetic(20), user.getId());
 
-        mockMvc.perform(get(String.format("/api/v1/expense/%s", expense.getId()))
+        mockMvc.perform(get(String.format("/api/v1/expense/find/%s", expense.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isOk());
@@ -190,7 +191,7 @@ class ExpenseRestControllerTest {
     void find_unsuccessful() throws Exception {
         User user = userBuilder.buildUser();
 
-        mockMvc.perform(get(String.format("/api/v1/expense/%s", UUID.randomUUID()))
+        mockMvc.perform(get(String.format("/api/v1/expense/find/%s", UUID.randomUUID()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isNotFound());
@@ -205,9 +206,10 @@ class ExpenseRestControllerTest {
             prepareTest(RandomStringUtils.randomAlphabetic(20), user.getId());
         }
 
-        mockMvc.perform(get("/api/v1/expense")
-                        .param("page", "0")
-                        .param("size", "10")
+        ExpenseFindAllRequest request = ExpenseBuilder.buildFindAllRequest();
+
+        mockMvc.perform(post("/api/v1/expense/find")
+                        .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isOk());
@@ -218,7 +220,10 @@ class ExpenseRestControllerTest {
     void find_empty_successful() throws Exception {
         User user = userBuilder.buildUser();
 
-        mockMvc.perform(get("/api/v1/expense")
+        ExpenseFindAllRequest request = ExpenseBuilder.buildFindAllRequest();
+
+        mockMvc.perform(post("/api/v1/expense/find")
+                        .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isOk());

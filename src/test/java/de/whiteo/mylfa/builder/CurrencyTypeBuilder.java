@@ -2,6 +2,7 @@ package de.whiteo.mylfa.builder;
 
 import de.whiteo.mylfa.domain.CurrencyType;
 import de.whiteo.mylfa.dto.currencytype.CurrencyTypeCreateOrUpdateRequest;
+import de.whiteo.mylfa.dto.currencytype.CurrencyTypeFindAllRequest;
 import de.whiteo.mylfa.repository.CurrencyTypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -23,6 +24,12 @@ public class CurrencyTypeBuilder {
         CurrencyTypeCreateOrUpdateRequest request = new CurrencyTypeCreateOrUpdateRequest();
         request.setName(name);
         request.setHide(new Random().nextBoolean());
+        return request;
+    }
+
+    public static CurrencyTypeFindAllRequest buildFindAllRequest() {
+        CurrencyTypeFindAllRequest request = new CurrencyTypeFindAllRequest();
+        request.setHide(random.nextBoolean());
         return request;
     }
 

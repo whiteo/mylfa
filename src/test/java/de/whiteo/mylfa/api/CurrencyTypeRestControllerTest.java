@@ -6,10 +6,11 @@ import de.whiteo.mylfa.builder.UserBuilder;
 import de.whiteo.mylfa.domain.CurrencyType;
 import de.whiteo.mylfa.domain.User;
 import de.whiteo.mylfa.dto.currencytype.CurrencyTypeCreateOrUpdateRequest;
+import de.whiteo.mylfa.dto.currencytype.CurrencyTypeFindAllRequest;
 import de.whiteo.mylfa.helper.TokenHelper;
 import de.whiteo.mylfa.repository.CurrencyTypeRepository;
 import de.whiteo.mylfa.repository.UserRepository;
-import de.whiteo.mylfa.util.JwtTokenUtil;
+import de.whiteo.mylfa.security.TokenInteract;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -46,11 +47,11 @@ class CurrencyTypeRestControllerTest {
     private CurrencyTypeRepository repository;
     @Autowired
     private UserRepository userRepository;
-    private CurrencyTypeBuilder builder;
+    @Autowired
+    private TokenInteract tokenInteract;
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private CurrencyTypeBuilder builder;
     private TokenHelper tokenHelper;
     private UserBuilder userBuilder;
     private MockMvc mockMvc;
@@ -59,7 +60,7 @@ class CurrencyTypeRestControllerTest {
     void initialize() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         builder = new CurrencyTypeBuilder(repository);
-        tokenHelper = new TokenHelper(jwtTokenUtil);
+        tokenHelper = new TokenHelper(tokenInteract);
         userBuilder = new UserBuilder(userRepository);
     }
 
@@ -73,7 +74,7 @@ class CurrencyTypeRestControllerTest {
         CurrencyTypeCreateOrUpdateRequest request = CurrencyTypeBuilder.buildRequest(
                 RandomStringUtils.randomAlphabetic(20));
 
-        mockMvc.perform(post("/api/v1/currency-type")
+        mockMvc.perform(post("/api/v1/currency-type/create")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -90,7 +91,7 @@ class CurrencyTypeRestControllerTest {
 
         CurrencyTypeCreateOrUpdateRequest request = CurrencyTypeBuilder.buildRequest(randomString);
 
-        mockMvc.perform(post("/api/v1/currency-type")
+        mockMvc.perform(post("/api/v1/currency-type/create")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -104,7 +105,7 @@ class CurrencyTypeRestControllerTest {
 
         CurrencyType currencyType = prepareTest(RandomStringUtils.randomAlphabetic(20), user);
 
-        mockMvc.perform(delete("/api/v1/currency-type/" + currencyType.getId())
+        mockMvc.perform(delete(String.format("/api/v1/currency-type/delete/%s", currencyType.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isNoContent());
@@ -115,7 +116,7 @@ class CurrencyTypeRestControllerTest {
     void delete_unsuccessful() throws Exception {
         User user = userBuilder.buildUser();
 
-        mockMvc.perform(delete(String.format("/api/v1/currency-type/%s", UUID.randomUUID()))
+        mockMvc.perform(delete(String.format("/api/v1/currency-type/delete/%s", UUID.randomUUID()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isNotFound());
@@ -131,7 +132,7 @@ class CurrencyTypeRestControllerTest {
         CurrencyTypeCreateOrUpdateRequest request = CurrencyTypeBuilder.buildRequest(
                 RandomStringUtils.randomAlphabetic(20));
 
-        mockMvc.perform(put(String.format("/api/v1/currency-type/%s/edit", currencyType.getId()))
+        mockMvc.perform(put(String.format("/api/v1/currency-type/edit/%s", currencyType.getId()))
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -148,7 +149,7 @@ class CurrencyTypeRestControllerTest {
 
         CurrencyTypeCreateOrUpdateRequest request = CurrencyTypeBuilder.buildRequest(randomString);
 
-        mockMvc.perform(put(String.format("/api/v1/currency-type/%s/edit", currencyType.getId()))
+        mockMvc.perform(put(String.format("/api/v1/currency-type/edit/%s", currencyType.getId()))
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
@@ -162,7 +163,7 @@ class CurrencyTypeRestControllerTest {
 
         CurrencyType currencyType = prepareTest(RandomStringUtils.randomAlphabetic(20), user);
 
-        mockMvc.perform(get(String.format("/api/v1/currency-type/%s", currencyType.getId()))
+        mockMvc.perform(get(String.format("/api/v1/currency-type/find/%s", currencyType.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isOk());
@@ -188,9 +189,10 @@ class CurrencyTypeRestControllerTest {
             prepareTest(RandomStringUtils.randomAlphabetic(20), user);
         }
 
-        mockMvc.perform(get("/api/v1/currency-type")
-                        .param("page", "0")
-                        .param("size", "10")
+        CurrencyTypeFindAllRequest request = CurrencyTypeBuilder.buildFindAllRequest();
+
+        mockMvc.perform(post("/api/v1/currency-type/find")
+                        .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isOk());
@@ -201,7 +203,10 @@ class CurrencyTypeRestControllerTest {
     void find_empty_successful() throws Exception {
         User user = userBuilder.buildUser();
 
-        mockMvc.perform(get("/api/v1/currency-type")
+        CurrencyTypeFindAllRequest request = CurrencyTypeBuilder.buildFindAllRequest();
+
+        mockMvc.perform(post("/api/v1/currency-type/find")
+                        .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", tokenHelper.getToken(user.getEmail())))
                 .andExpect(status().isOk());

@@ -1,4 +1,4 @@
-package de.whiteo.mylfa.config;
+package de.whiteo.mylfa.aspect;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

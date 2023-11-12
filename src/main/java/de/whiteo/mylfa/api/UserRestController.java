@@ -10,7 +10,6 @@ import de.whiteo.mylfa.security.AuthInterceptor;
 import de.whiteo.mylfa.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,63 +27,50 @@ import java.util.UUID;
  * @author Leo Tanas (<a href="https://github.com/whiteo">github</a>)
  */
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/user")
 @Auth(AuthInterceptor.class)
+@RequestMapping("/api/v1/user")
 public class UserRestController {
 
     private final UserService service;
 
-    @GetMapping("/{id}")
+    @GetMapping("/find/{id}")
     public ResponseEntity<UserResponse> find(@PathVariable("id") UUID id) {
-        log.debug("Start call 'find' with parameters: {}", id);
         UserResponse response = service.find(id);
-        log.debug("End call 'find' with answer {}", response);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/create")
     public ResponseEntity<Void> create(@Valid @RequestBody UserCreateRequest request) {
-        log.debug("Start call 'create' with parameters: {}", request);
         service.create(request);
-        log.debug("End call 'create'");
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/{id}/edit")
+    @PutMapping("/edit/{id}")
     public ResponseEntity<UserResponse> update(@PathVariable("id") UUID id,
                                                @Valid @RequestBody UserUpdateRequest updateRequest) {
-        log.debug("Start call 'update' with parameters: {} {}", id, updateRequest);
         UserResponse response = service.update(id, updateRequest);
-        log.debug("End call 'update' with answer {}", response);
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}/edit-properties")
+    @PutMapping("/edit-properties/{id}")
     public ResponseEntity<UserResponse> updateProperties(@PathVariable("id") UUID id,
                                                @Valid @RequestBody UserUpdatePropertiesRequest updateRequest) {
-        log.debug("Start call 'updateProperties' with parameters: {} {}", id, updateRequest);
         UserResponse response = service.updateProperties(id, updateRequest);
-        log.debug("End call 'updateProperties' with answer {}", response);
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}/edit-password")
+    @PutMapping("/edit-password/{id}")
     public ResponseEntity<UserResponse> updatePassword(@PathVariable("id") UUID id,
                                                        @Valid @RequestBody UserUpdatePasswordRequest updateRequest) {
-        log.debug("Start call 'updatePassword' with parameters: {} {}", id, updateRequest);
         UserResponse response = service.updatePassword(id, updateRequest);
-        log.debug("End call 'updatePassword' with answer {}", response);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") UUID id) {
-        log.debug("Start call 'delete' with parameters: {}", id);
         service.delete(id);
-        log.debug("End call 'delete'");
         return ResponseEntity.noContent().build();
     }
 }

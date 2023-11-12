@@ -2,6 +2,7 @@ package de.whiteo.mylfa.builder;
 
 import de.whiteo.mylfa.domain.IncomeCategory;
 import de.whiteo.mylfa.dto.incomecategory.IncomeCategoryCreateOrUpdateRequest;
+import de.whiteo.mylfa.dto.incomecategory.IncomeCategoryFindAllRequest;
 import de.whiteo.mylfa.repository.IncomeCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -32,6 +33,12 @@ public class IncomeCategoryBuilder {
         request.setName(name);
         request.setHide(new Random().nextBoolean());
         request.setParentId(parentId);
+        return request;
+    }
+
+    public static IncomeCategoryFindAllRequest buildFindAllRequest() {
+        IncomeCategoryFindAllRequest request = new IncomeCategoryFindAllRequest();
+        request.setHide(random.nextBoolean());
         return request;
     }
 

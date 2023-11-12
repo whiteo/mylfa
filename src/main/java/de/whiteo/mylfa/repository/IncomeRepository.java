@@ -24,8 +24,8 @@ public interface IncomeRepository extends AbstractRepository<Income> {
     List<Object[]> findByUserIdAndId(@Param("userId") UUID userId, @Param("id") UUID id);
 
     @Query("SELECT i, ct, ic FROM Income i " +
-            "LEFT JOIN CurrencyType ct ON i.currencyTypeId = ct.id AND ct.userId = :userId " +
-            "LEFT JOIN IncomeCategory ic ON i.categoryId = ic.id AND ic.userId = :userId " +
+            "INNER JOIN CurrencyType ct ON i.currencyTypeId = ct.id AND ct.hide = false AND ct.userId = :userId " +
+            "INNER JOIN IncomeCategory ic ON i.categoryId = ic.id AND ic.userId = :userId " +
             "WHERE i.userId = :userId " +
             "AND (coalesce(:categoryId, NULL) IS NULL OR i.categoryId = :categoryId) " +
             "AND (coalesce(:currencyTypeId, NULL) IS NULL OR i.currencyTypeId = :currencyTypeId) " +

@@ -1,6 +1,5 @@
 package de.whiteo.mylfa.security;
 
-import de.whiteo.mylfa.util.JwtTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -22,7 +21,9 @@ import org.springframework.web.servlet.ModelAndView;
 public class AuthInterceptor implements HandlerInterceptor {
 
     private final ThreadLocal<String> users = new ThreadLocal<>();
-    private final JwtTokenUtil jwtTokenUtil;
+
+    private final TokenInteract tokenInteract;
+
 
     @Override
     public boolean preHandle(HttpServletRequest request, @NonNull HttpServletResponse response,
@@ -35,9 +36,9 @@ public class AuthInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        String token = jwtTokenUtil.getToken(request);
-        if (jwtTokenUtil.validateToken(token)) {
-            String user = jwtTokenUtil.getUser(token);
+        String token = tokenInteract.getToken(request);
+        if (tokenInteract.validateToken(token)) {
+            String user = tokenInteract.getUser(token);
             if (StringUtils.isNotBlank(user)) {
                 users.set(user);
                 return true;

@@ -1,6 +1,6 @@
 package de.whiteo.mylfa.service;
 
-import de.whiteo.mylfa.config.NoModifyDemoMode;
+import de.whiteo.mylfa.aspect.NoModifyDemoMode;
 import de.whiteo.mylfa.domain.User;
 import de.whiteo.mylfa.dto.user.UserCreateRequest;
 import de.whiteo.mylfa.dto.user.UserLoginRequest;
@@ -17,8 +17,8 @@ import de.whiteo.mylfa.repository.ExpenseRepository;
 import de.whiteo.mylfa.repository.IncomeCategoryRepository;
 import de.whiteo.mylfa.repository.IncomeRepository;
 import de.whiteo.mylfa.repository.UserRepository;
+import de.whiteo.mylfa.security.TokenInteract;
 import de.whiteo.mylfa.security.UserDetailsImpl;
-import de.whiteo.mylfa.util.JwtTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,7 @@ public class UserService implements UserDetailsService {
     private final ExpenseRepository expenseRepository;
     private final IncomeRepository incomeRepository;
     private final LanguageService languageService;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final TokenInteract tokenInteract;
     private final UserRepository repository;
     private final UserMapper mapper;
 
@@ -128,12 +128,12 @@ public class UserService implements UserDetailsService {
 
         UserResponse response = mapper.toResponse(user);
 
-        return mapper.toLoginResponse(response, jwtTokenUtil.generateToken(loadUserByUsername(user.getEmail())));
+        return mapper.toLoginResponse(response, tokenInteract.generateToken(loadUserByUsername(user.getEmail())));
     }
 
     public Boolean validateToken(HttpServletRequest request) {
-        String token = jwtTokenUtil.getToken(request);
-        return jwtTokenUtil.validateToken(token);
+        String token = tokenInteract.getToken(request);
+        return tokenInteract.validateToken(token);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package de.whiteo.mylfa.service;
 
-import de.whiteo.mylfa.config.NoModifyDemoMode;
+import de.whiteo.mylfa.aspect.NoModifyDemoMode;
 import de.whiteo.mylfa.domain.AbstractEntity;
 import de.whiteo.mylfa.domain.User;
 import de.whiteo.mylfa.exception.ExecutionConflictException;

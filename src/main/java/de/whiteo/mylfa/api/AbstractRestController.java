@@ -6,7 +6,6 @@ import de.whiteo.mylfa.security.AuthInterceptor;
 import de.whiteo.mylfa.service.AbstractService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,44 +22,35 @@ import java.util.UUID;
  * @author Leo Tanas (<a href="https://github.com/whiteo">github</a>)
  */
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @Auth(AuthInterceptor.class)
-public abstract class AbstractRestController<E extends AbstractEntity, D, R> {
+public abstract class AbstractRestController<E extends AbstractEntity, Res, Req> {
 
-    private final AbstractService<E, D, R> service;
+    private final AbstractService<E, Res, Req> service;
     private final AuthInterceptor authInterceptor;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<D> findById(@PathVariable("id") UUID id) {
-        log.debug("Start call 'findById' with parameters: {}", id);
-        D response = service.findById(authInterceptor.getUserName(), id);
-        log.debug("End call 'findById' with answer {}", response);
+    @GetMapping("/find/{id}")
+    public ResponseEntity<Res> findById(@PathVariable("id") UUID id) {
+        Res response = service.findById(authInterceptor.getUserName(), id);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping
-    public ResponseEntity<Void> create(@Valid @RequestBody R request) {
-        log.debug("Start call 'create' with parameters: {}", request);
+    @PostMapping("/create")
+    public ResponseEntity<Void> create(@Valid @RequestBody Req request) {
         service.create(authInterceptor.getUserName(), request);
-        log.debug("End call 'create'");
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/{id}/edit")
-    public ResponseEntity<D> update(@PathVariable("id") UUID id, @Valid @RequestBody R request) {
-        log.debug("Start call 'update' with parameters: {}, {}", id, request);
-        D response = service.update(authInterceptor.getUserName(), id, request);
-        log.debug("End call 'update' with answer {}", response);
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<Res> update(@PathVariable("id") UUID id, @Valid @RequestBody Req request) {
+        Res response = service.update(authInterceptor.getUserName(), id, request);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") UUID id) {
-        log.debug("Start call 'delete' with parameters: {}", id);
         service.delete(authInterceptor.getUserName(), id);
-        log.debug("End call 'delete'");
         return ResponseEntity.noContent().build();
     }
 }

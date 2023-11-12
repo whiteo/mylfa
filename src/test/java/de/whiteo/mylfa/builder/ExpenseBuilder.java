@@ -2,6 +2,7 @@ package de.whiteo.mylfa.builder;
 
 import de.whiteo.mylfa.domain.Expense;
 import de.whiteo.mylfa.dto.expense.ExpenseCreateOrUpdateRequest;
+import de.whiteo.mylfa.dto.expense.ExpenseFindAllRequest;
 import de.whiteo.mylfa.repository.ExpenseRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -27,6 +28,10 @@ public class ExpenseBuilder {
         request.setCategoryId(incomeCategoryId);
         request.setCurrencyTypeId(currencyTypeId);
         return request;
+    }
+
+    public static ExpenseFindAllRequest buildFindAllRequest() {
+        return new ExpenseFindAllRequest();
     }
 
     public static Expense buildExpense(UUID currencyTypeId, UUID categoryId) {
