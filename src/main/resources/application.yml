@@ -2,9 +2,9 @@ spring:
   application:
     name: mylfa
   datasource:
-    url: jdbc:postgresql://ru.cloud.whiteo.de:5432/mylfa
-    username: dbuser
-    password: Password!23
+    url: jdbc:postgresql://${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PWD}
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
@@ -39,15 +39,15 @@ logging:
   level:
     de:
       whiteo:
-        mylfa: DEBUG
+        mylfa: ${APP_LOG_LEVEL}
 jwt:
   expiration:
-    time: 86400000
+    time: ${TOKEN_EXPIRATION_TIME}
   secret:
-    key: super_secret_key_yeah_this_key_is_amazing_1234567890!@#
+    key: ${TOKEN_SECRET_KEY}
 app:
   version: "@project.version@"
-  demo-only: false
+  demo-only: ${DEMO_ONLY}
   main-directory: "./mylfa/"
   lang-directory: "./mylfa/languages/"
   lang-repository: "https://github.com/tesseract-ocr/tessdata/raw/main/"
