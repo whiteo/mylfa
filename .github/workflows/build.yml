@@ -118,13 +118,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Sonar Scan
-        uses: kitabisa/sonarqube-action@v1.2.1
+      - name: Cache Maven and SonarQube packages
+        uses: actions/cache@v3.3.2
         with:
-          host: ${{ secrets.SONAR_HOST }}
-          login: ${{ secrets.SONAR_TOKEN }}
-          projectKey: ${{ secrets.SONAR_PROJECT_KEY }}
-          projectName: 'mylfa'
+          path: |
+            ~/.m2
+            ~/.sonar/cache
+          key: ${{ runner.os }}-m2-sonar-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2-sonar
+
+      - name: Build and analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.projectName='mylfa'
 
   docker-deploy:
     needs: [ analyze ]
