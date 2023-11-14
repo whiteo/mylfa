@@ -15,12 +15,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0
 
       - name: Checkout badges branch to a badges directory nested inside first checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.1
         with:
           ref: badges
           path: badges
@@ -31,13 +31,13 @@ jobs:
           curl -o ./mylfa/languages/osd.traineddata https://github.com/tesseract-ocr/tessdata/raw/main/osd.traineddata
 
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v3.13.0
         with:
           java-version: '20'
           distribution: 'temurin'
 
       - name: Cache Maven and SonarQube packages
-        uses: actions/cache@v3
+        uses: actions/cache@v3.3.2
         with:
           path: |
             ~/.m2
@@ -59,7 +59,7 @@ jobs:
 
       - name: Generate JaCoCo badge
         id: jacoco
-        uses: cicirello/jacoco-badge-generator@v2
+        uses: cicirello/jacoco-badge-generator@v2.11.0
         with:
           badges-directory: badges
           generate-branches-badge: true
@@ -71,7 +71,7 @@ jobs:
           echo "branches = ${{ steps.jacoco.outputs.branches }}"
 
       - name: Upload JaCoCo coverage report as a workflow artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.3
         with:
           name: jacoco-report
           path: target/site/jacoco/
@@ -108,21 +108,21 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0
 
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v3.13.0
         with:
-          java-version: '20'
+          java-version: '17'
           distribution: 'temurin'
 
-      - name: SonarQube Scan
-        uses: kitabisa/sonarqube-action@v1.2.0
+      - name: Sonar Scan
+        uses: kitabisa/sonarqube-action@v1.2.1
         with:
-          host: ${{ secrets.SONARQUBE_HOST }}
-          login: ${{ secrets.SONARQUBE_TOKEN }}
+          host: ${{ secrets.SONAR_HOST }}
+          login: ${{ secrets.SONAR_TOKEN }}
           projectKey: ${{ secrets.SONAR_PROJECT_KEY }}
           projectName: 'mylfa'
 
@@ -132,12 +132,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.1
 
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v3.13.0
         with:
-          java-version: '20'
+          java-version: '17'
           distribution: 'temurin'
 
       - name: Build with Maven
@@ -148,15 +148,15 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v5.0.0
         with:
           images: whiteo/mylfa
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v3.0.0
 
       - name: Login to DockerHub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v3.0.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -166,7 +166,7 @@ jobs:
         run: echo "::set-output name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v5.0.0
         with:
           push: true
           context: ${{ github.workspace }}
@@ -185,7 +185,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.1
 
       - name: Archive source code
         run: zip -r source-code.zip .
@@ -207,7 +207,7 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -217,7 +217,7 @@ jobs:
         if: steps.check-release.outputs.release_exists != 'true'
 
       - name: Upload source code
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
