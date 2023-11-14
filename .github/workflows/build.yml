@@ -101,7 +101,7 @@ jobs:
 
   analyze:
     name: Analyze with SonarQube
-    needs: build-and-test
+    needs: [ test ]
     runs-on: ubuntu-latest
 
     steps:
@@ -121,7 +121,7 @@ jobs:
         run: mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.projectName='mylfa'
 
   docker-deploy:
-    needs: [ test ]
+    needs: [ analyze ]
     name: Docker release
     runs-on: ubuntu-latest
     steps:
