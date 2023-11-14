@@ -5,12 +5,12 @@ import de.whiteo.mylfa.dto.user.UserCreateRequest;
 import de.whiteo.mylfa.dto.user.UserResponse;
 import de.whiteo.mylfa.dto.user.UserUpdatePasswordRequest;
 import de.whiteo.mylfa.dto.user.UserUpdateRequest;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import jakarta.transaction.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -62,7 +62,8 @@ class UserServiceTest {
 
         UserUpdatePasswordRequest updateRequest = UserBuilder.buildUserPasswordUpdateRequest(
                 RandomStringUtils.randomAlphabetic(20), passwd);
-        service.updatePassword(createResponse.getId(), updateRequest);
+        UserResponse response = service.updatePassword(createResponse.getId(), updateRequest);
+        asserts(response, createResponse.getEmail());
     }
 
     @Test

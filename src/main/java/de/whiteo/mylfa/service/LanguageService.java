@@ -1,5 +1,6 @@
 package de.whiteo.mylfa.service;
 
+import de.whiteo.mylfa.exception.AppRuntimeException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +52,7 @@ public class LanguageService {
             }
             log.info("Downloading file '{}' has benn completed", fileName);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new AppRuntimeException(e);
         }
     }
 

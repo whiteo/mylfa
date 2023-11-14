@@ -25,26 +25,26 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @Auth(AuthInterceptor.class)
-public abstract class AbstractRestController<E extends AbstractEntity, Res, Req> {
+public abstract class AbstractRestController<E extends AbstractEntity, D, R> {
 
-    private final AbstractService<E, Res, Req> service;
+    private final AbstractService<E, D, R> service;
     private final AuthInterceptor authInterceptor;
 
     @GetMapping("/find/{id}")
-    public ResponseEntity<Res> findById(@PathVariable("id") UUID id) {
-        Res response = service.findById(authInterceptor.getUserName(), id);
+    public ResponseEntity<D> findById(@PathVariable("id") UUID id) {
+        D response = service.findById(authInterceptor.getUserName(), id);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Void> create(@Valid @RequestBody Req request) {
+    public ResponseEntity<Void> create(@Valid @RequestBody R request) {
         service.create(authInterceptor.getUserName(), request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<Res> update(@PathVariable("id") UUID id, @Valid @RequestBody Req request) {
-        Res response = service.update(authInterceptor.getUserName(), id, request);
+    public ResponseEntity<D> update(@PathVariable("id") UUID id, @Valid @RequestBody R request) {
+        D response = service.update(authInterceptor.getUserName(), id, request);
         return ResponseEntity.ok(response);
     }
 

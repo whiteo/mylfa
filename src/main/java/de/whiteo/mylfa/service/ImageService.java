@@ -1,7 +1,9 @@
 package de.whiteo.mylfa.service;
 
 import de.whiteo.mylfa.domain.User;
+import de.whiteo.mylfa.exception.AppRuntimeException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +23,7 @@ import java.util.regex.Pattern;
  * @author Leo Tanas (<a href="https://github.com/whiteo">github</a>)
  */
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImageService {
@@ -40,7 +43,7 @@ public class ImageService {
             String ocrResult = ocrResultFuture.join();
             return extractSumFromString(ocrResult);
         } catch (Exception e) {
-            System.out.println("OCR processing error: " + e.getMessage());
+            log.warn("OCR processing error: " + e.getMessage());
             return "0";
         }
     }
@@ -61,7 +64,7 @@ public class ImageService {
             InputStream is = new ByteArrayInputStream(bytes);
             return CompletableFuture.completedFuture(tesseract.doOCR(ImageIO.read(is)));
         } catch (TesseractException | IOException e) {
-            throw new RuntimeException(e);
+            throw new AppRuntimeException(e);
         }
     }
 

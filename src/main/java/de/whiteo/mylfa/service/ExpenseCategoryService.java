@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * @author Leo Tanas (<a href="https://github.com/whiteo">github</a>)
@@ -49,7 +48,7 @@ public class ExpenseCategoryService extends
         Page<Object[]> page = repository.findAllByParamsWithJoin(user.getId(), request.getHide(), pageable);
 
         List<ExpenseCategoryResponse> responses = page.stream()
-                .map(this::mapObjectsToResponse).collect(Collectors.toList());
+                .map(this::mapObjectsToResponse).toList();
 
         return new PageImpl<>(responses, pageable, page.getTotalElements());
     }
