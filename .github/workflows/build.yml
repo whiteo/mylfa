@@ -54,8 +54,9 @@ jobs:
           DATABASE_PWD: ${{ secrets.DATABASE_PWD }}
           DATABASE_USER: ${{ secrets.DATABASE_USER }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          mvn -B clean verify
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.projectName='mylfa'
 
       - name: Generate JaCoCo badge
         id: jacoco
@@ -101,40 +102,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  analyze:
-    name: Analyze with SonarQube
-    needs: [ test ]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up JDK
-        uses: actions/setup-java@v3.13.0
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Cache Maven and SonarQube packages
-        uses: actions/cache@v3.3.2
-        with:
-          path: |
-            ~/.m2
-            ~/.sonar/cache
-          key: ${{ runner.os }}-m2-sonar-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2-sonar
-
-      - name: Build and analyze
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.projectName='mylfa'
-
   docker-deploy:
-    needs: [ analyze ]
+    needs: [ test ]
     name: Docker release
     runs-on: ubuntu-latest
     steps:
