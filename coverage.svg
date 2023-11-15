@@ -1,22 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" height="20" width="131">
+<svg xmlns="http://www.w3.org/2000/svg" height="20" width="120">
     <!-- SONARQUBE MEASURE -->
     <linearGradient id="b" x2="0" y2="100%">
         <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
         <stop offset="1" stop-opacity=".1"/>
     </linearGradient>
     <clipPath id="a">
-        <rect width="131" height="20" rx="3" fill="#fff"/>
+        <rect width="120" height="20" rx="3" fill="#fff"/>
     </clipPath>
     <g clip-path="url(#a)">
         <rect fill="#555" height="20" width="82"/>
-        <rect fill="#999999" height="20" width="49" x="82"/>
-        <rect fill="url(#b)" height="20" width="131"/>
+        <rect fill="#999999" height="20" width="38" x="82"/>
+        <rect fill="url(#b)" height="20" width="120"/>
     </g>
     <g fill="#fff" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11" text-anchor="left">
         <text x="26" y="15" textLength="50" fill="#010101" fill-opacity=".3">coverage</text>
         <text x="26" y="14" textLength="50">coverage</text>
-        <text x="88" y="15" textLength="37" fill="#010101" fill-opacity=".3">76.2%</text>
-        <text x="88" y="14" textLength="37">76.2%</text>
+        <text x="88" y="15" textLength="26" fill="#010101" fill-opacity=".3">73%</text>
+        <text x="88" y="14" textLength="26">73%</text>
     </g>
     <g fill="#4e9bcd">
         <path d="M17.975 16.758h-.815c0-6.557-5.411-11.893-12.062-11.893v-.813c7.102 0 12.877 5.7 12.877 12.706z"/>
