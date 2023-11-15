@@ -1,6 +1,12 @@
 [![build](https://github.com/whiteo/mylfa/actions/workflows/build.yml/badge.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
-[![coverage](https://raw.githubusercontent.com/whiteo/mylfa/badges/jacoco.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
-[![branch coverage](https://raw.githubusercontent.com/whiteo/mylfa/badges/branches.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
+[![quality gate](https://raw.githubusercontent.com/whiteo/mylfa/badges/quality_gate_status.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
+[![reliability](https://raw.githubusercontent.com/whiteo/mylfa/badges/reliability_rating.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
+[![maintainability](https://raw.githubusercontent.com/whiteo/mylfa/badges/maintainability_rating.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
+[![security](https://raw.githubusercontent.com/whiteo/mylfa/badges/security_rating.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
+[![vulnerabilities](https://raw.githubusercontent.com/whiteo/mylfa/badges/vulnerabilities.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
+[![bugs](https://raw.githubusercontent.com/whiteo/mylfa/badges/bugs.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
+[![lines](https://raw.githubusercontent.com/whiteo/mylfa/badges/lines_of_code.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
+[![duplicate](https://raw.githubusercontent.com/whiteo/mylfa/badges/duplicated_lines.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
 [![Docker Version](https://img.shields.io/docker/v/whiteo/mylfa?sort=semver)](https://hub.docker.com/r/whiteo/mylfa/)
 
 # MyLFA aka my little finance analyst — a software to manage and analyze your finances.
@@ -17,7 +23,7 @@ Contents
 
 Overview
 --------
-MyLFA is a software for finance management and analysis.
+MyLFA is software for finance management and analysis.
 One day I decided to record my financial transactions, such as shopping at a store or a cafe, and I found that out of
 all the services that exist, I cannot find what I like, so I created MyLFA.
 

@@ -12,6 +12,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 
 /**
@@ -41,7 +42,7 @@ public class LanguageService {
 
         try {
             log.info("Downloading file '{}' has been started", fileName);
-            URL url = new URL(repository + fileName);
+            URL url = URI.create(repository + fileName).toURL();
             try (BufferedInputStream in = new BufferedInputStream(url.openStream());
                  FileOutputStream fileOutputStream = new FileOutputStream(directory + fileName)) {
                 byte[] dataBuffer = new byte[1024];
