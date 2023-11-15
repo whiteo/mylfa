@@ -3,6 +3,7 @@
 [![reliability](https://raw.githubusercontent.com/whiteo/mylfa/badges/reliability_rating.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
 [![maintainability](https://raw.githubusercontent.com/whiteo/mylfa/badges/maintainability_rating.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
 [![security](https://raw.githubusercontent.com/whiteo/mylfa/badges/security_rating.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
+[![coverage](https://raw.githubusercontent.com/whiteo/mylfa/badges/coverage.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
 [![vulnerabilities](https://raw.githubusercontent.com/whiteo/mylfa/badges/vulnerabilities.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
 [![bugs](https://raw.githubusercontent.com/whiteo/mylfa/badges/bugs.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)
 [![lines](https://raw.githubusercontent.com/whiteo/mylfa/badges/lines_of_code.svg)](https://github.com/whiteo/mylfa/actions/workflows/build.yml)

@@ -50,39 +50,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.projectName='mylfa-webapp'
-
-      - name: Checkout badges branch to a badges directory nested inside first checkout
-        uses: actions/checkout@v4.1.1
-        with:
-          ref: badges
-          path: badges
-
-      - name: Download badges
-        run: |
-          curl -o badges/coverage.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=coverage&token=${{ secrets.SONAR_BADGE_TOKEN }}"
-          curl -o badges/bugs.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=bugs&token=${{ secrets.SONAR_BADGE_TOKEN }}"
-          curl -o badges/duplicated_lines.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=duplicated_lines_density&token=${{ secrets.SONAR_BADGE_TOKEN }}"
-          curl -o badges/lines_of_code.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=ncloc&token=${{ secrets.SONAR_BADGE_TOKEN }}"
-          curl -o badges/maintainability_rating.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=sqale_rating&token=${{ secrets.SONAR_BADGE_TOKEN }}"
-          curl -o badges/quality_gate_status.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=alert_status&token=${{ secrets.SONAR_BADGE_TOKEN }}"
-          curl -o badges/reliability_rating.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=reliability_rating&token=${{ secrets.SONAR_BADGE_TOKEN }}"
-          curl -o badges/security_rating.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=security_rating&token=${{ secrets.SONAR_BADGE_TOKEN }}"
-          curl -o badges/vulnerabilities.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=vulnerabilities&token=${{ secrets.SONAR_BADGE_TOKEN }}"
-
-      - name: Commit and push badges
-        if: ${{ github.event_name != 'pull_request' }}
-        run: |
-          cd badges
-          if [[ `git status --porcelain *.svg` ]]; then
-            git config --global user.name 'github-actions'
-            git config --global user.email '1650200+github-actions[bot]@users.noreply.github.com'
-            git add *.svg
-            git commit -m "Update badges"
-            git push
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.projectName='mylfa'
 
   docker-deploy:
     needs: [ analyze ]
@@ -183,3 +151,58 @@ jobs:
           asset_path: ./source-code.zip
           asset_name: source-code.zip
           asset_content_type: application/zip
+
+  badges:
+    needs: [ gh-release-deploy ]
+    name: Badges upload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout badges branch to a badges directory nested inside first checkout
+        uses: actions/checkout@v4.1.1
+        with:
+          ref: badges
+          path: badges
+
+      - name: Download badges
+        run: |
+          curl -o badges/coverage.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=coverage&token=${{ secrets.SONAR_BADGE_TOKEN }}"
+          curl -o badges/bugs.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=bugs&token=${{ secrets.SONAR_BADGE_TOKEN }}"
+          curl -o badges/duplicated_lines.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=duplicated_lines_density&token=${{ secrets.SONAR_BADGE_TOKEN }}"
+          curl -o badges/lines_of_code.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=ncloc&token=${{ secrets.SONAR_BADGE_TOKEN }}"
+          curl -o badges/maintainability_rating.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=sqale_rating&token=${{ secrets.SONAR_BADGE_TOKEN }}"
+          curl -o badges/quality_gate_status.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=alert_status&token=${{ secrets.SONAR_BADGE_TOKEN }}"
+          curl -o badges/reliability_rating.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=reliability_rating&token=${{ secrets.SONAR_BADGE_TOKEN }}"
+          curl -o badges/security_rating.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=security_rating&token=${{ secrets.SONAR_BADGE_TOKEN }}"
+          curl -o badges/vulnerabilities.svg "${{ secrets.SONAR_HOST_URL }}/api/project_badges/measure?project=${{ secrets.SONAR_PROJECT_KEY }}&metric=vulnerabilities&token=${{ secrets.SONAR_BADGE_TOKEN }}"
+
+      - name: Commit and push badges
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          cd badges
+          if [[ `git status --porcelain *.svg` ]]; then
+            git config --global user.name 'github-actions'
+            git config --global user.email '1650200+github-actions[bot]@users.noreply.github.com'
+            git add *.svg
+            git commit -m "Update badges"
+            git push
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: [ badges ]
+    name: Docker deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: install ssh keys
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+
+      - name: connect and pull
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.SSH_WORK_DIR }} && docker compose pull && docker compose up -d && exit"
+
+      - name: cleanup
+        run: rm -rf ~/.ssh
